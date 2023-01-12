@@ -3,11 +3,18 @@
 #include <stdint.h>
 //#include "my_header.h"
 
+struct c_string_vec {
+  const char **ptr;
+  uint64_t len;
+  uint64_t cap;
+};
+
 extern char *read_name();
 
 extern void read_name_to_buf();
 extern uint64_t read_names_to_bufs();
-extern uint64_t allocate_names();
+extern struct c_string_vec allocate_names();
+extern void free_names(struct c_string_vec);
 
 int main() {
     //
@@ -28,6 +35,15 @@ int main() {
         printf("%s\n", bufs[i]);
     }
     //
-    
+    // allocate and free in a loop so we can see that we don't leak memory (and
+    // if you comment out free_names(names) you can see that we do leak memory)
+    while (1) {
+        struct c_string_vec names = allocate_names();
+        for (int i = 0; i < q.len; i++) {
+            printf("%s\n", q.ptr[i]);
+        }
+        free_names(names);
+    }
+    //
     return 0;
 }
