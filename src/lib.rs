@@ -1,15 +1,13 @@
+#![feature(vec_into_raw_parts)]
 use std::os::raw::c_char;
 use std::ffi::CString;
 
-use std::alloc::Global;
-
 #[repr(C)]
-struct c_string_vec {
+pub struct c_string_vec {
     ptr: *mut *const c_char,
     len: u64,
     cap: u64,
 }
-
 
 // TODO:" bounds checking
 unsafe fn write_string_to_buf(s: &str, buf: *mut c_char) {
@@ -55,8 +53,8 @@ pub extern "C" fn read_names_to_bufs(bufs: *mut *mut c_char) -> u64 {
 
 
 #[no_mangle]
-pub extern "C" fn allocate_names(num: *mut u64) -> c_string_vec {
-    let c_string_ptrs: Vec<*const c_char> = Vec::new();
+pub extern "C" fn allocate_names() -> c_string_vec {
+    let mut c_string_ptrs: Vec<*const c_char> = Vec::new();
     let contents = std::fs::read_to_string("names.txt").unwrap();
     let strs: Vec<&str> = contents.split("\n").collect();
     for s in strs {
